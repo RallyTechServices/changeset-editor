@@ -3,18 +3,18 @@
 <head>
     <title>TS Changeset Editor</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Mon Nov 21 2016 20:20:31 GMT-0800 (PST) -->
+    <!--  Build Date: Mon Nov 28 2016 16:06:22 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon Nov 21 2016 20:20:31 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Mon Nov 28 2016 16:06:22 GMT-0800 (PST)";
         var STORY    = "US920";
-        var BUILDER  = "jmartin";
-        var CHECKSUM = 12670104305;
+        var BUILDER  = "arajaraman";
+        var CHECKSUM = 13097858875;
     </script>
     
-    <script type="text/javascript" src="/apps/2.0/sdk.js"></script>
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
     <!-- our highcharts (needed so that we can add patterns) -->
-    <script type="text/javascript" src="/apps/2.0/lib/analytics/analytics-all.js"></script>
+    <script type="text/javascript" src="/apps/2.1/lib/analytics/analytics-all.js"></script>
 
     <script type="text/javascript">
         Rally.onReady(function() {
@@ -703,24 +703,43 @@ Ext.define("TSChangesetEditor", {
                     },
                     fieldPickerConfig: { 
                         pickerCfg: {
-                            height: 150
+                            height: 250
                         } 
                     },
                     gridAlwaysSelectedValues: this._getAlwaysSelectedFields(),
                     margin: '3 0 0 10'
-                },{
-                    ptype: 'rallygridboardcustomfiltercontrol',
-                    filterControlConfig: {
-                        modelNames: modelNames,
+                },
+                {
+                    ptype: 'rallygridboardinlinefiltercontrol',
+                    inlineFilterButtonConfig: {
                         stateful: true,
-                        stateId: this.getContext().getScopedStateId('portfolio-grid-filter-2')
-                    },
-                    showOwnerFilter: true,
-                    ownerFilterControlConfig: {
-                       stateful: true,
-                       stateId: this.getContext().getScopedStateId('portfolio-owner-filter-2')
+                        stateId: 'ca.techservices.changeset.filter',
+                            modelNames: modelNames,
+                            inlineFilterPanelConfig: {
+                                quickFilterPanelConfig: {
+                                    defaultFields: [
+                                        'ArtifactSearch',
+                                        'Owner',
+                                        'Iteration'
+                                ]
+                            }
+                        }
                     }
                 }
+                // ,
+                // {
+                //     ptype: 'rallygridboardcustomfiltercontrol',
+                //     filterControlConfig: {
+                //         modelNames: modelNames,
+                //         stateful: true,
+                //         stateId: this.getContext().getScopedStateId('portfolio-grid-filter-2')
+                //     },
+                //     showOwnerFilter: true,
+                //     ownerFilterControlConfig: {
+                //        stateful: true,
+                //        stateId: this.getContext().getScopedStateId('portfolio-owner-filter-2')
+                //     }
+                // }
 
             ],
             storeConfig: {

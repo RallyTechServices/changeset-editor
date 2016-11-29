@@ -244,24 +244,43 @@ Ext.define("TSChangesetEditor", {
                     },
                     fieldPickerConfig: { 
                         pickerCfg: {
-                            height: 150
+                            height: 250
                         } 
                     },
                     gridAlwaysSelectedValues: this._getAlwaysSelectedFields(),
                     margin: '3 0 0 10'
-                },{
-                    ptype: 'rallygridboardcustomfiltercontrol',
-                    filterControlConfig: {
-                        modelNames: modelNames,
+                },
+                {
+                    ptype: 'rallygridboardinlinefiltercontrol',
+                    inlineFilterButtonConfig: {
                         stateful: true,
-                        stateId: this.getContext().getScopedStateId('portfolio-grid-filter-2')
-                    },
-                    showOwnerFilter: true,
-                    ownerFilterControlConfig: {
-                       stateful: true,
-                       stateId: this.getContext().getScopedStateId('portfolio-owner-filter-2')
+                        stateId: 'ca.techservices.changeset.filter',
+                            modelNames: modelNames,
+                            inlineFilterPanelConfig: {
+                                quickFilterPanelConfig: {
+                                    defaultFields: [
+                                        'ArtifactSearch',
+                                        'Owner',
+                                        'Iteration'
+                                ]
+                            }
+                        }
                     }
                 }
+                // ,
+                // {
+                //     ptype: 'rallygridboardcustomfiltercontrol',
+                //     filterControlConfig: {
+                //         modelNames: modelNames,
+                //         stateful: true,
+                //         stateId: this.getContext().getScopedStateId('portfolio-grid-filter-2')
+                //     },
+                //     showOwnerFilter: true,
+                //     ownerFilterControlConfig: {
+                //        stateful: true,
+                //        stateId: this.getContext().getScopedStateId('portfolio-owner-filter-2')
+                //     }
+                // }
 
             ],
             storeConfig: {
