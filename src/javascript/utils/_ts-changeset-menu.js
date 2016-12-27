@@ -47,7 +47,7 @@ Ext.define('CA.techservices.recordmenu.changesetedit', {
         });
 
         var columns = this._getColumns();
-console.log('columns', columns);
+        //console.log('columns', columns);
 
         Ext.create('Rally.ui.dialog.Dialog', {
             id       : 'popup',
@@ -68,15 +68,14 @@ console.log('columns', columns);
             }]
         });
     },
-    
+
     _getColumns: function() {
         var me = this;
         var artifact = this.record;
-        
-        return [{
+        var columns = [{
             xtype: 'rallyrowactioncolumn',
             rowActionsFn: function (record) {
-                console.log('record', record);
+                //console.log('record', record);
                 return [
                     {
                         xtype: 'tschangesetmenuitemdisconnect',
@@ -111,5 +110,7 @@ console.log('columns', columns);
             dataIndex: 'CommitTimestamp',
             text: 'Timestamp'
         }];
+
+        return columns;
     }
 });

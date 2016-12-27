@@ -3,13 +3,13 @@
 <head>
     <title>TS Changeset Editor</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Mon Nov 28 2016 16:06:22 GMT-0800 (PST) -->
+    <!--  Build Date: Tue Dec 27 2016 11:40:18 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon Nov 28 2016 16:06:22 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Tue Dec 27 2016 11:40:18 GMT-0800 (PST)";
         var STORY    = "US920";
         var BUILDER  = "arajaraman";
-        var CHECKSUM = 13097858875;
+        var CHECKSUM = 14436574729;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -231,7 +231,7 @@ Ext.define('CA.techservices.recordmenu.changesetdisconnect', {
     _removeFromArtifact: function(changeset,record) {
         // a hack to get the grid.  must be a better way
         var display_store = this.store;
-        
+        console.log('_removeFromArtifact>>>>>');
         var changeset_store = record.getCollection('Changesets');
         changeset_store.load({
             callback: function() {
@@ -322,11 +322,34 @@ console.log('columns', columns);
         });
     },
     
+/*
+
+{
+            xtype: 'rallyrowactioncolumn',
+            rowActionsFn: function (record) {
+                return [
+                    {
+                        xtype: 'tschangesetmenuitemdisconnect',
+                        record: artifact,
+                        changeset: record,
+                        store: me.store
+                    },
+                    {
+                        xtype: 'tschangesetmenuitemreparent',
+                        record: artifact,
+                        changeset: record,
+                        store: me.store
+                    }
+                ];
+            }
+        }
+
+*/
+
     _getColumns: function() {
         var me = this;
         var artifact = this.record;
-        
-        return [{
+        var columns = [{
             xtype: 'rallyrowactioncolumn',
             rowActionsFn: function (record) {
                 console.log('record', record);
@@ -364,6 +387,8 @@ console.log('columns', columns);
             dataIndex: 'CommitTimestamp',
             text: 'Timestamp'
         }];
+
+        return columns;
     }
 });
 Ext.define('CA.techservices.recordmenu.ChangesetReparent', {
@@ -434,7 +459,7 @@ Ext.define('CA.techservices.recordmenu.ChangesetReparent', {
     
     _removeFromArtifact: function(changeset,record) {
         var deferred = Ext.create('Deft.Deferred');
-
+        console.log('_removeFromArtifact>>');
         // a hack to get the store.  must be a better way
         var display_store = this.store;
         
@@ -456,6 +481,27 @@ Ext.define('CA.techservices.recordmenu.ChangesetReparent', {
         });
         return deferred.promise;
     }
+});
+Ext.override(Rally.ui.grid.RowActionColumn, {
+
+    /**
+     * @private
+     * @param value
+     * @param metaData
+     * @param record
+     */
+    _renderGearIcon: function(value, metaData, record) {
+        console.log("_renderGearIcon",record.get('_type'));
+
+        metaData.tdCls = Rally.util.Test.toBrowserTestCssClass('row-action', Rally.util.Ref.getOidFromRef(record.get('_ref')));
+
+        var gearIconHtml = '<div class="row-action-icon icon-gear"/>';
+        // if(record.self.typePath === 'recyclebinentry'){
+        //     return record.get('updatable') ? gearIconHtml : '';
+        // }
+
+        return gearIconHtml;
+    },
 });
 Ext.define("TSChangesetEditor", {
     
@@ -708,7 +754,8 @@ Ext.define("TSChangesetEditor", {
                     },
                     gridAlwaysSelectedValues: this._getAlwaysSelectedFields(),
                     margin: '3 0 0 10'
-                },
+                }
+                ,
                 {
                     ptype: 'rallygridboardinlinefiltercontrol',
                     inlineFilterButtonConfig: {

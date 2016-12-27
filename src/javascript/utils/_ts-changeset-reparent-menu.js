@@ -66,7 +66,6 @@ Ext.define('CA.techservices.recordmenu.ChangesetReparent', {
     
     _removeFromArtifact: function(changeset,record) {
         var deferred = Ext.create('Deft.Deferred');
-
         // a hack to get the store.  must be a better way
         var display_store = this.store;
         
