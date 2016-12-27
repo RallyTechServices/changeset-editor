@@ -249,7 +249,8 @@ Ext.define("TSChangesetEditor", {
                     },
                     gridAlwaysSelectedValues: this._getAlwaysSelectedFields(),
                     margin: '3 0 0 10'
-                },
+                }
+                ,
                 {
                     ptype: 'rallygridboardinlinefiltercontrol',
                     inlineFilterButtonConfig: {

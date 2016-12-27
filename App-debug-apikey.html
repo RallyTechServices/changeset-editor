@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TS Changeset Editor</title>
+    <script type="text/javascript">
+        var APP_BUILD_DATE = "Mon Dec 05 2016 13:56:52 GMT-0800 (PST)";
+    </script>
+    
+    <script type="text/javascript" src="https://us1.rallydev.com/apps/2.1/sdk-debug.js?apiKey=_PUT_APIKEY_HERE_"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function() {
+            Rally.loadScripts(["src/javascript/utils/__ts-info-link.js","src/javascript/utils/__ts-logger.js","src/javascript/utils/_ts-changeset-disconnect-menu.js","src/javascript/utils/_ts-changeset-menu.js","src/javascript/utils/_ts-changeset-reparent-menu.js","src/javascript/app.js"],
+	            function() {
+	                Rally.launchApp('TSChangesetEditor', {
+	                    name: 'TS Changeset Editor'
+	                })
+	            }, true);
+        });
+    </script>
+<link rel="stylesheet" type="text/css" href="src/style/app.css">
+
+</head>
+<body></body>
+</html>
