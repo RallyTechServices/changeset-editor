@@ -7,8 +7,6 @@ Ext.override(Rally.ui.grid.RowActionColumn, {
      * @param record
      */
     _renderGearIcon: function(value, metaData, record) {
-        console.log("_renderGearIcon",record.get('_type'));
-
         metaData.tdCls = Rally.util.Test.toBrowserTestCssClass('row-action', Rally.util.Ref.getOidFromRef(record.get('_ref')));
 
         var gearIconHtml = '<div class="row-action-icon icon-gear"/>';
@@ -17,5 +15,5 @@ Ext.override(Rally.ui.grid.RowActionColumn, {
         // }
 
         return gearIconHtml;
-    },
+    }
 });

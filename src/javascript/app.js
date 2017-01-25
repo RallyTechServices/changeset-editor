@@ -9,6 +9,7 @@ Ext.define("TSChangesetEditor", {
         defaultSettings: {
             type: 'hierarchicalrequirement',
             columnNames: ['FormattedID','Name'],
+            allowChangesetCreation: false,
             showControls: true
         }
     },
@@ -305,6 +306,10 @@ Ext.define("TSChangesetEditor", {
                             {
                                 xtype: 'tschangesetmenuitemedit',
                                 record: record
+                            },
+                            {
+                                xtype: 'tschangesetmenuitemcreate',
+                                record: record
                             }
                         ];
                     }
@@ -349,6 +354,14 @@ Ext.define("TSChangesetEditor", {
 
     _shouldEnableRanking: function(){
         return this.getSetting('type').toLowerCase() !== 'task';
+    },
+    
+    getSettingsFields: function() {
+        return [{
+            name: 'allowChangesetCreation',
+            xtype: 'rallycheckboxfield',
+            fieldLabel: 'Allow Changeset Creation'
+        }];
     }
     
 });

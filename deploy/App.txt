@@ -3,13 +3,13 @@
 <head>
     <title>TS Changeset Editor</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Dec 27 2016 11:40:18 GMT-0800 (PST) -->
+    <!--  Build Date: Tue Jan 24 2017 19:47:06 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Dec 27 2016 11:40:18 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Tue Jan 24 2017 19:47:06 GMT-0800 (PST)";
         var STORY    = "US920";
-        var BUILDER  = "arajaraman";
-        var CHECKSUM = 14436574729;
+        var BUILDER  = "jmartin";
+        var CHECKSUM = 21939740403;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -212,6 +212,273 @@ Ext.define('Rally.technicalservices.Logger',{
 
 });
 
+Ext.define('Ca.technicalservices.ChangesetCreateDialog',{
+    extend: 'Rally.ui.dialog.Dialog',
+    alias: 'widget.tschangesetcreatedialog',
+    
+    closable: true,
+    layout: 'fit',
+    
+    config: {
+        title: 'Create Changeset',
+        
+        autoShow: true,
+        /**
+         * @cfg {String}
+         * Text to be displayed on the button when selection is complete
+         */
+        selectionButtonText: 'Save',
+        
+        height: 400,
+        width: 600
+    },
+
+    items: {
+        xtype: 'panel',
+        itemId: 'mainPanel',
+        border: false
+    },
+    
+    constructor: function(config) {
+        this.mergeConfig(config);
+        this.callParent([this.config]);
+    },
+
+    initComponent: function() {
+        this.callParent(arguments);
+        this._buildButtons();
+        this._buildForm();
+    },
+
+    _buildForm: function() {
+        var me = this,
+            panel = this.down('#mainPanel');
+        
+        var container = panel.add({
+            xtype: 'container',
+            itemId: 'formContainer',
+            layout: 'vbox',
+            height: 500,
+            defaults: {
+                margin: 10,
+                width: 500,
+                listeners: {
+                    scope: this,
+                    change: this._enableDisableSaveButton
+                }
+            }
+        });
+        
+        container.add({
+            xtype: 'rallycombobox',
+            name: 'SCMRepository',
+            fieldLabel: 'SCM Repository',
+            storeConfig:{
+                autoLoad: true,
+                model:'SCMRepository'
+            }
+        });
+        
+        container.add({
+            xtype: 'rallyusercombobox',
+            name: 'Author',
+            fieldLabel: 'Author'
+        });
+        
+        container.add({
+            xtype: 'rallytextfield',
+            name: 'CommitTimestamp',
+            fieldLabel: 'Commit Timetamp',
+            validator: function(v) {
+                // looking for 2016-10-01T12:00:39
+                var regex = /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d)|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d)/;
+                if ( regex.test(v) ) {
+                    return true;
+                }
+                return "Format (use time at UTC): 2016-12-01T12:00:00";
+            }
+        });   
+        
+        container.add({
+            xtype: 'rallytextfield',
+            name: 'Revision',
+            fieldLabel: 'Revision'
+        });
+        
+        container.add({
+            xtype: 'rallytextfield',
+            name: 'Uri',
+            fieldLabel: 'Commit URL',
+            validator: function(value) {
+                if ( /^http/.test(value) ) {
+                    return true;
+                }
+                
+                return "URL must begin with http or https";
+            }
+        });
+        
+        container.add({
+            xtype:'rallyrichtexteditor',
+            name:'Message',
+            fieldLabel: 'Commit Message',
+            labelAlign: 'top'
+        });
+    },
+    
+    _enableDisableSaveButton: function() {
+        var button = this.down('#saveButton')
+        if ( !button) {
+            return;
+        }
+        
+        var value = this._getData();
+        
+        if ( Ext.isEmpty(value) || Ext.Object.isEmpty(value) ) {
+            button.setDisabled(true);
+            return false;
+        }
+        
+        var disabled = false;
+        Ext.Object.each(value, function(key,v){
+            if ( Ext.isEmpty(v) ) {
+                disabled = true;
+            }
+        });
+        button.setDisabled(disabled);
+        return disabled;
+    },
+    
+    _getData: function() {
+        var me = this,
+            container = this.down('#formContainer');
+        
+        var value = {};
+        
+        var children = container.query('*');
+        
+        Ext.each(children, function(child){
+            value[child.name] = child.getValue();
+        });
+                
+        return value;
+    },
+    
+    /**
+     * @private
+     */
+    _buildButtons: function() {
+
+        this.down('panel').addDocked({
+            xtype: 'toolbar',
+            dock: 'bottom',
+            padding: '0 0 10 0',
+            layout: {
+                type: 'hbox',
+                pack: 'center'
+            },
+            ui: 'footer',
+            items: [
+                {
+                    xtype: 'rallybutton',
+                    text: this.selectionButtonText,
+                    itemId:'saveButton',
+                    cls: 'primary small',
+                    scope: this,
+                    disabled: true,
+                    userAction: 'clicked done in dialog',
+                    handler: function() {
+                        
+                        this.fireEvent('dataReady', this, this._getData());
+                        this.close();
+                    }
+                },
+                {
+                    xtype: 'rallybutton',
+                    text: 'Cancel',
+                    cls: 'secondary small',
+                    handler: this.close,
+                    scope: this,
+                    ui: 'link'
+                }
+            ]
+        });
+
+    }
+});
+Ext.define('CA.techservices.recordmenu.changesetcreate', {
+    alias:'widget.tschangesetmenuitemcreate',
+    extend:'Rally.ui.menu.item.RecordMenuItem',
+
+    config:{
+        predicate: function(record) {
+            console.log(record, this._isChangesetable(record));
+            return this._isChangesetable(record);
+        },
+
+        handler: function() {
+            this._displayDialog(this.record);
+        },
+
+        text: 'Create Changeset...'
+    },
+    
+    _isChangesetable: function(record) {
+        var valid_types = ['hierarchicalrequirement','defect','task'];
+        var record_type = record.get('_type').toLowerCase();
+        
+        return Ext.Array.contains(valid_types, record_type);
+    },
+    
+    _displayDialog: function(record) {
+        var me = this;
+        
+        var title = Ext.String.format("Create Changeset for {0}:{1}",
+            record.get('FormattedID'),
+            record.get('Name')
+        );
+        
+        Ext.create('Ca.technicalservices.ChangesetCreateDialog', {
+            id       : 'popup',
+            width    : Ext.getBody().getWidth() - 50,
+            height   : Ext.getBody().getHeight() - 50,
+            title    : title,
+            listeners: {
+                scope: this,
+                dataReady: function(dialog,value) {
+                    value.Artifacts = [{ _ref: record.get('_ref')}];
+                    me._makeChangeset(value);
+                }
+            }
+        });
+    },
+    
+    _makeChangeset: function(value) {
+        var me = this;
+        console.log("Saving:", value);
+        
+        this.setLoading("Saving...");
+        
+        Rally.data.ModelFactory.getModel({
+            type: 'Changeset',
+            success: function(model) {
+                var record  = Ext.create(model, value);
+                record.save({
+                    callback: function(result, operation) {
+                        if ( operation.wasSuccessful() ) {
+                            console.log("Save Result:", result);
+                            Rally.ui.notify.Notifier.showCreate({artifact: result, showRank: false});
+                        } else {
+                            Rally.ui.notify.Notifier.showError({message:"Problem saving changeset"});
+                            console.error("Save Result:", operation);
+                        }
+                        me.setLoading(false);
+                    }
+                });
+            }
+        });
+    }
+});
 Ext.define('CA.techservices.recordmenu.changesetdisconnect', {
     alias:'widget.tschangesetmenuitemdisconnect',
     extend:'Rally.ui.menu.item.RecordMenuItem',
@@ -231,7 +498,6 @@ Ext.define('CA.techservices.recordmenu.changesetdisconnect', {
     _removeFromArtifact: function(changeset,record) {
         // a hack to get the grid.  must be a better way
         var display_store = this.store;
-        console.log('_removeFromArtifact>>>>>');
         var changeset_store = record.getCollection('Changesets');
         changeset_store.load({
             callback: function() {
@@ -257,7 +523,6 @@ Ext.define('CA.techservices.recordmenu.changesetedit', {
 
     config:{
         predicate: function(record) {
-            console.log(record, this._isChangesetable(record));
             return this._isChangesetable(record);
         },
 
@@ -300,7 +565,7 @@ Ext.define('CA.techservices.recordmenu.changesetedit', {
         });
 
         var columns = this._getColumns();
-console.log('columns', columns);
+        //console.log('columns', columns);
 
         Ext.create('Rally.ui.dialog.Dialog', {
             id       : 'popup',
@@ -321,30 +586,6 @@ console.log('columns', columns);
             }]
         });
     },
-    
-/*
-
-{
-            xtype: 'rallyrowactioncolumn',
-            rowActionsFn: function (record) {
-                return [
-                    {
-                        xtype: 'tschangesetmenuitemdisconnect',
-                        record: artifact,
-                        changeset: record,
-                        store: me.store
-                    },
-                    {
-                        xtype: 'tschangesetmenuitemreparent',
-                        record: artifact,
-                        changeset: record,
-                        store: me.store
-                    }
-                ];
-            }
-        }
-
-*/
 
     _getColumns: function() {
         var me = this;
@@ -352,7 +593,7 @@ console.log('columns', columns);
         var columns = [{
             xtype: 'rallyrowactioncolumn',
             rowActionsFn: function (record) {
-                console.log('record', record);
+                //console.log('record', record);
                 return [
                     {
                         xtype: 'tschangesetmenuitemdisconnect',
@@ -459,7 +700,6 @@ Ext.define('CA.techservices.recordmenu.ChangesetReparent', {
     
     _removeFromArtifact: function(changeset,record) {
         var deferred = Ext.create('Deft.Deferred');
-        console.log('_removeFromArtifact>>');
         // a hack to get the store.  must be a better way
         var display_store = this.store;
         
@@ -491,8 +731,6 @@ Ext.override(Rally.ui.grid.RowActionColumn, {
      * @param record
      */
     _renderGearIcon: function(value, metaData, record) {
-        console.log("_renderGearIcon",record.get('_type'));
-
         metaData.tdCls = Rally.util.Test.toBrowserTestCssClass('row-action', Rally.util.Ref.getOidFromRef(record.get('_ref')));
 
         var gearIconHtml = '<div class="row-action-icon icon-gear"/>';
@@ -501,7 +739,7 @@ Ext.override(Rally.ui.grid.RowActionColumn, {
         // }
 
         return gearIconHtml;
-    },
+    }
 });
 Ext.define("TSChangesetEditor", {
     
@@ -514,6 +752,7 @@ Ext.define("TSChangesetEditor", {
         defaultSettings: {
             type: 'hierarchicalrequirement',
             columnNames: ['FormattedID','Name'],
+            allowChangesetCreation: false,
             showControls: true
         }
     },
@@ -810,6 +1049,10 @@ Ext.define("TSChangesetEditor", {
                             {
                                 xtype: 'tschangesetmenuitemedit',
                                 record: record
+                            },
+                            {
+                                xtype: 'tschangesetmenuitemcreate',
+                                record: record
                             }
                         ];
                     }
@@ -854,6 +1097,14 @@ Ext.define("TSChangesetEditor", {
 
     _shouldEnableRanking: function(){
         return this.getSetting('type').toLowerCase() !== 'task';
+    },
+    
+    getSettingsFields: function() {
+        return [{
+            name: 'allowChangesetCreation',
+            xtype: 'rallycheckboxfield',
+            fieldLabel: 'Allow Changeset Creation'
+        }];
     }
     
 });

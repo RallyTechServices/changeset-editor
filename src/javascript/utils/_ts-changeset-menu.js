@@ -4,7 +4,6 @@ Ext.define('CA.techservices.recordmenu.changesetedit', {
 
     config:{
         predicate: function(record) {
-            console.log(record, this._isChangesetable(record));
             return this._isChangesetable(record);
         },
 
