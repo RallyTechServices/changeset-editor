@@ -87,6 +87,12 @@ Ext.define('CA.techservices.recordmenu.changesetedit', {
                         record: artifact,
                         changeset: record,
                         store: me.store
+                    },
+                    {
+                    	xtype: 'tschangesetmenuitemdelete',
+                    	record: artifact,
+                    	changeset: record,
+                    	store: me.store
                     }
                 ];
             }

@@ -3,13 +3,13 @@
 <head>
     <title>TS Changeset Editor</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jan 24 2017 19:47:06 GMT-0800 (PST) -->
+    <!--  Build Date: Fri Feb 24 2017 10:35:51 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jan 24 2017 19:47:06 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Fri Feb 24 2017 10:35:51 GMT-0800 (PST)";
         var STORY    = "US920";
-        var BUILDER  = "jmartin";
-        var CHECKSUM = 21939740403;
+        var BUILDER  = "marjo60";
+        var CHECKSUM = 23655704741;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -479,6 +479,32 @@ Ext.define('CA.techservices.recordmenu.changesetcreate', {
         });
     }
 });
+Ext.define('CA.techservices.recordmenu.changesetdelete', {
+    alias:'widget.tschangesetmenuitemdelete',
+    extend:'Rally.ui.menu.item.RecordMenuItem',
+
+    config:{
+        predicate: function(record) {
+            return true;
+        },
+
+        handler: function() {
+            this._delete(this.changeset);
+        },
+
+        text: 'Delete Changeset'
+    },
+    
+    _delete: function(changeset) {
+        // a hack to get the grid.  must be a better way
+        var display_store = this.store;
+        changeset.destroy({
+            callback: function(result, operation) {
+            	display_store.load();
+            }
+        });
+    }
+});
 Ext.define('CA.techservices.recordmenu.changesetdisconnect', {
     alias:'widget.tschangesetmenuitemdisconnect',
     extend:'Rally.ui.menu.item.RecordMenuItem',
@@ -606,6 +632,12 @@ Ext.define('CA.techservices.recordmenu.changesetedit', {
                         record: artifact,
                         changeset: record,
                         store: me.store
+                    },
+                    {
+                    	xtype: 'tschangesetmenuitemdelete',
+                    	record: artifact,
+                    	changeset: record,
+                    	store: me.store
                     }
                 ];
             }
@@ -817,7 +849,7 @@ Ext.define("TSChangesetEditor", {
     },
     
     getModelNames: function() {
-        return ['HierarchicalRequirement'];
+        return [this.getSetting('type').toLowerCase()];
     },
     
     loadGridBoard: function(){
@@ -1100,10 +1132,28 @@ Ext.define("TSChangesetEditor", {
     },
     
     getSettingsFields: function() {
+    	
+    	var types = Ext.create('Ext.data.Store', {
+    	    fields: ['name', 'value'],
+    	    data: [
+    	    	{name:'Story',value:'hierarchicalrequirement'},
+    	    	{name:'Defect', value:'defect'}
+	    	]
+    	});
         return [{
             name: 'allowChangesetCreation',
             xtype: 'rallycheckboxfield',
             fieldLabel: 'Allow Changeset Creation'
+        },
+        {
+            name: 'type',
+            xtype: 'combobox',
+            fieldLabel: 'Root Level Type',
+            store: types,
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            readyState: 'ready'
         }];
     }
     

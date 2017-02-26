@@ -74,7 +74,7 @@ Ext.define("TSChangesetEditor", {
     },
     
     getModelNames: function() {
-        return ['HierarchicalRequirement'];
+        return [this.getSetting('type').toLowerCase()];
     },
     
     loadGridBoard: function(){
@@ -357,10 +357,28 @@ Ext.define("TSChangesetEditor", {
     },
     
     getSettingsFields: function() {
+    	
+    	var types = Ext.create('Ext.data.Store', {
+    	    fields: ['name', 'value'],
+    	    data: [
+    	    	{name:'Story',value:'hierarchicalrequirement'},
+    	    	{name:'Defect', value:'defect'}
+	    	]
+    	});
         return [{
             name: 'allowChangesetCreation',
             xtype: 'rallycheckboxfield',
             fieldLabel: 'Allow Changeset Creation'
+        },
+        {
+            name: 'type',
+            xtype: 'combobox',
+            fieldLabel: 'Root Level Type',
+            store: types,
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'value',
+            readyState: 'ready'
         }];
     }
     
